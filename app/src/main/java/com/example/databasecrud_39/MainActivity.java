@@ -85,10 +85,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    int rollNo = Integer.parseInt(deleteRollNumber.getText().toString());
-                    if(String.valueOf(rollNo).isEmpty()){
+                    if(deleteRollNumber.getText().toString().isEmpty()){
                         throw new RuntimeException("Roll number is required");
                     }
+                    int rollNo = Integer.parseInt(deleteRollNumber.getText().toString());
                     DBHelper dbHelper  = new DBHelper(MainActivity.this);
                     dbHelper.deleteStudent(rollNo);
                     Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_SHORT).show();
