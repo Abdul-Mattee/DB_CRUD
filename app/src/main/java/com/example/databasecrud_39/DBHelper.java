@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -15,11 +16,12 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String STUDENT_ROLL = "StudentRollNumber";
     public static final String STUDENT_ENROLL = "IsEnrolled";
     public static final String STUDENT_TABLE = "StudentTable";
-
+    Context c;
 
 
     public DBHelper(@Nullable Context context) {
         super(context, "MyDB.db", null, 1);
+        c = context;
     }
 
     @Override
@@ -38,14 +40,14 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void  addStudent(StudentModel STUDENTModel){
+    public void  addStudent(StudentModel StdModel){
         SQLiteDatabase db = this.getWritableDatabase();
         //Hash map, as we did in bundles
         ContentValues cv = new ContentValues();
 
-        cv.put(STUDENT_NAME, STUDENTModel.getName());
-        cv.put(STUDENT_ROLL, STUDENTModel.getRollNmber());
-        cv.put(STUDENT_ENROLL, STUDENTModel.isEnroll());
+        cv.put(STUDENT_NAME, StdModel.getName());
+        cv.put(STUDENT_ROLL, StdModel.getRollNmber());
+        cv.put(STUDENT_ENROLL, StdModel.isEnroll());
         db.insert(STUDENT_TABLE, null, cv);
         db.close();
         //NullCoumnHack
@@ -53,7 +55,28 @@ public class DBHelper extends SQLiteOpenHelper {
         //if (insert == -1) { return false; }
         //else{return true;}
     }
-
+    public StudentModel getStudent(int rollNo) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + STUDENT_TABLE + " Where RollNo = " + rollNo + "limit 1", null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        StudentModel student = new StudentModel(cursor.getString(0),cursor.getInt(1), cursor.getInt(3) == 1 ? true : false);
+            return student;
+    }
+    public void updateStudent(StudentModel StdModel) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        StudentModel student = getStudent(StdModel.getRollNmber());
+        System.out.println(student);
+        if(student.getName() != null){
+            cv.put(STUDENT_NAME, StdModel.getName());
+            cv.put(STUDENT_ROLL, StdModel.getRollNmber());
+            cv.put(STUDENT_ENROLL, StdModel.isEnroll());
+        } else {
+            Toast.makeText(c,"No Student found with this roll no",Toast.LENGTH_SHORT).show();
+        }
+    }
     public ArrayList<StudentModel> getAllStudents() {
 
         SQLiteDatabase db = this.getReadableDatabase();
