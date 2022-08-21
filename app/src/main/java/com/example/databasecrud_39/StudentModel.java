@@ -62,5 +62,4 @@ public class StudentModel {
     public void setEnroll(boolean enroll) {
         isEnroll = enroll;
     }
-
 }
