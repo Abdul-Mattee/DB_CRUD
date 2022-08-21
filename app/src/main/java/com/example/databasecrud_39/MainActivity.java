@@ -12,6 +12,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,19 +36,20 @@ public class MainActivity extends AppCompatActivity {
         listViewStudent = findViewById(R.id.listViewStudent);
 
         buttonAdd.setOnClickListener(new View.OnClickListener() {
-            StudentModel studentModel;
-
             @Override
             public void onClick(View v) {
                 try {
-                    studentModel = new StudentModel(editName.getText().toString(), Integer.parseInt(editRollNumber.getText().toString()), switchIsActive.isChecked());
-                    //Toast.makeText(MainActivity.this, studentModel.toString(), Toast.LENGTH_SHORT).show();
+                    if(editName.getText().toString().isEmpty() || editRollNumber.getText().toString().isEmpty()){
+                        throw new RuntimeException("Roll number and name is required");
+                    }
+                    StudentModel studentModel = new StudentModel(editName.getText().toString(), Integer.parseInt(editRollNumber.getText().toString()), switchIsActive.isChecked());
+                    DBHelper dbHelper  = new DBHelper(MainActivity.this);
+                    dbHelper.addStudent(studentModel);
+                    Toast.makeText(MainActivity.this, "Student added as" + studentModel.getName(), Toast.LENGTH_SHORT).show();
                 }
                 catch (Exception e){
-                    Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                 }
-                DBHelper dbHelper  = new DBHelper(MainActivity.this);
-                dbHelper.addStudent(studentModel);
             }
         });
 
@@ -63,19 +65,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         buttonUpdate.setOnClickListener(new View.OnClickListener() {
-            StudentModel studentModel;
             @Override
             public void onClick(View v) {
-                if(editName.getText().toString().isEmpty() || editRollNumber.getText().toString().isEmpty()){
-                    Toast.makeText(MainActivity.this, "Please Enter Values first", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 try {
-                    studentModel = new StudentModel(editName.getText().toString(), Integer.parseInt(editRollNumber.getText().toString()), switchIsActive.isChecked());
-                    //Toast.makeText(MainActivity.this, studentModel.toString(), Toast.LENGTH_SHORT).show();
+                    if(editName.getText().toString().isEmpty() || editRollNumber.getText().toString().isEmpty()){
+                        throw new RuntimeException("Roll number and name is required");
+                    }
+                    StudentModel studentModel = new StudentModel(editName.getText().toString(), Integer.parseInt(editRollNumber.getText().toString()), switchIsActive.isChecked());
                     DBHelper dbHelper  = new DBHelper(MainActivity.this);
                     dbHelper.updateStudent(studentModel);
-                    Toast.makeText(MainActivity.this, "Update Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
                 }
                 catch (Exception e){
                     Toast.makeText(MainActivity.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -83,15 +82,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         buttonDelete.setOnClickListener(new View.OnClickListener() {
-            StudentModel studentModel;
             @Override
             public void onClick(View v) {
-                if(deleteRollNumber.getText().toString().isEmpty()){
-                    Toast.makeText(MainActivity.this, "Please Enter Values Roll Number to delete", Toast.LENGTH_SHORT).show();
-                    return;
-                }
                 try {
                     int rollNo = Integer.parseInt(deleteRollNumber.getText().toString());
+                    if(String.valueOf(rollNo).isEmpty()){
+                        throw new RuntimeException("Roll number is required");
+                    }
                     DBHelper dbHelper  = new DBHelper(MainActivity.this);
                     dbHelper.deleteStudent(rollNo);
                     Toast.makeText(MainActivity.this, "Deleted Successfully", Toast.LENGTH_SHORT).show();

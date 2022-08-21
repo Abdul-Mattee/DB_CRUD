@@ -93,7 +93,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
     public void updateStudent(StudentModel StdModel) {
-        //checking for table and student
+        //checks
         CheckIfTableHasValues();
         CheckIfStudentExists(StdModel.getRollNmber());
 
@@ -106,7 +106,7 @@ public class DBHelper extends SQLiteOpenHelper {
             db.close();
     }
     public void deleteStudent(int rollNumber){
-        //checking for table and student
+        //checks
         CheckIfTableHasValues();
         CheckIfStudentExists(rollNumber);
         SQLiteDatabase db = this.getWritableDatabase();
